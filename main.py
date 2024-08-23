@@ -53,7 +53,7 @@ def parse_single_file(file_path):
                 for pattern_elem in rule_elem.findall('.//pcre2'):
                     if pattern_elem.text:
                         cleaned_pattern = pattern_elem.text.strip().replace('|', '').replace('^$', '')
-                        if cleaned_pattern:  # Only add non-empty patterns
+                        if cleaned_pattern:
                             patterns.append(cleaned_pattern)
                 
                 rules.append(Rule(rule_id, level, description, category, patterns))
