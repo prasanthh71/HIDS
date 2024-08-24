@@ -83,7 +83,7 @@ def is_attack_detected(log_message, rules):
                 compiled_pattern = re.compile(pattern)
                 
                 if compiled_pattern.search(log_message):
-                    print(compiled_pattern)
+                    # print(compiled_pattern)
                     return True, rule
             except re.error as e:
                 print(f"Error in pattern {pattern} for rule ID {rule.id}: {str(e)}")
@@ -91,8 +91,8 @@ def is_attack_detected(log_message, rules):
     return False, None
 
 rules_directory = './rules.d'
-all_rules = parse_ossec_rules(rules_directory)
 if __name__ == '__main__':
+    all_rules = parse_ossec_rules(rules_directory)
     append_rules_to_json('./parsedRules.json',all_rules)
 
 
