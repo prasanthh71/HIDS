@@ -55,13 +55,19 @@ def run_tests(rules, test_directory):
                         passed_tests += 1
                         break
                     else:
-                        logging.info(f"Test failed: {test['name']},{filename}")
-                        logging.info(f"Expected rule: {expected_rule_id}, Expected alert: {expected_alert}")
-                        logging.info(f"Log: {log}")
+                        log_message = (
+                            f"Test failed: {test['name']}, File: {filename}\n"
+                            f"Expected rule: {expected_rule_id}, Expected alert: {expected_alert}\n"
+                            f"Log: {log}\n"
+                        )
                         if is_attack:
-                            logging.info(f"Detected rule: {detected_rule.id}, Detected alert level: {detected_rule.level}")
+                            log_message += (
+                                f"Detected rule: {detected_rule.id}, Detected alert level: {detected_rule.level}\n"
+                            )
                         else:
-                            logging.info("No rule detected")
+                            log_message += "No rule detected\n"
+                        
+                        logging.info(log_message)
 
     print(f"Total tests: {total_tests}")
     print(f"Passed tests: {passed_tests}")
