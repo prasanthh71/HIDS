@@ -418,7 +418,7 @@
   <rule id="5303" level="3">
     <if_sid>5300</if_sid>
     <pcre2>session opened for user root|^'su root'|</pcre2>
-    <pcre2>^\+ \S+ \S+[()*+,.:;\<=>?\[\]!"'#%&$|{}-]root$|^\S+ to root on|^SU \S+ \S+ \+ \S+ \S+-root$</pcre2>
+    <!-- <pcre2>^\+ \S+ \S+[()*+,.:;\<=>?\[\]!"'#%&$|{}-]root$|^\S+ to root on|^SU \S+ \S+ \+ \S+ \S+-root$</pcre2> -->
     <description>User successfully changed UID to root.</description>
     <group>authentication_success,</group>
   </rule>

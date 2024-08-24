@@ -1,7 +1,8 @@
 from main import is_attack_detected,all_rules
 
 tests = [
-    "Failed opening the log files please check the permissions"
+    "file system full",
+    "No space left on device for appending"
 ]
 for sample_log in tests:
     attack_detected, matching_rule = is_attack_detected(sample_log, all_rules)

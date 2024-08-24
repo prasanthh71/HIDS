@@ -52,7 +52,9 @@ def parse_single_file(file_path):
                 patterns = []
                 for pattern_elem in rule_elem.findall('.//pcre2'):
                     if pattern_elem.text:
-                        cleaned_pattern = pattern_elem.text.strip().replace('|', '').replace('^$', '')
+                        # cleaned_pattern = pattern_elem.text.strip().replace('|', '').replace('^$', '')
+                        # if cleaned_pattern:
+                        cleaned_pattern = pattern_elem.text.strip().rstrip('|')
                         if cleaned_pattern:
                             patterns.append(cleaned_pattern)
                 
@@ -88,7 +90,7 @@ def is_attack_detected(log_message, rules):
                 
     return False, None
 
-rules_directory = './HIDSTesting'
+rules_directory = './rules.d'
 all_rules = parse_ossec_rules(rules_directory)
 if __name__ == '__main__':
     append_rules_to_json('./parsedRules.json',all_rules)
