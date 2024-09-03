@@ -168,6 +168,21 @@ def search_logs(automaton, logs):
             matches.append((rule_id, description, log))
     return matches
 
+import pickle
+
+# Assume `automaton` is the automaton you've built
+def save_automaton(automaton, filename='automaton.pkl'):
+    with open(filename, 'wb') as f:
+        pickle.dump(automaton, f)
+    print(f"Automaton saved to {filename}")
+    
+def load_automaton(filename='automaton.pkl'):
+    with open(filename, 'rb') as f:
+        automaton = pickle.load(f)
+    print(f"Automaton loaded from {filename}")
+    return automaton
+
+
 # Example Usage
 rules = [
     Rule(1, 3, "SSH login attempt", "Authentication", patterns=["failed password", "Invalid user"]),
@@ -188,3 +203,5 @@ logs = [
 matches = search_logs(automaton, logs)
 for match in matches:
     print(f"Match found: Rule ID {match[0]}, Description: {match[1]}, Log: {match[2]}")
+    
+save_automaton(automaton)
