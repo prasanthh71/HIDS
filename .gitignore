@@ -1,6 +1,4 @@
 __pycache__
 files
-ossec-rules
 parsedRules.json
-HIDSTesting
 test_failures.log
