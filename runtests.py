@@ -1,7 +1,9 @@
 import configparser
-from main import parse_ossec_rules,rules_directory,is_attack_detected
+from main import parse_ossec_rules
 import os
 import logging
+from constants import test_directory,rules_directory
+import re
 
 def setup_logging(log_file='test_failures.log'):
     logging.basicConfig(
@@ -9,6 +11,21 @@ def setup_logging(log_file='test_failures.log'):
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
+
+def is_attack_detected(log_message, rules):
+    for rule in rules:
+        for pattern in rule.patterns:
+            try:
+                compiled_pattern = re.compile(pattern)
+                
+                if compiled_pattern.search(log_message):
+                    # print(compiled_pattern)
+                    return True, rule
+            except re.error as e:
+                print(f"Error in pattern {pattern} for rule ID {rule.id}: {str(e)}")
+                
+    return False, None
+
 
 def parse_test_file(file_path):
     config = configparser.ConfigParser(allow_no_value=True, interpolation=None)
@@ -74,7 +91,5 @@ def run_tests(rules, test_directory):
     print(f"Accuracy: {passed_tests / total_tests * 100:.2f}%")
     
 if __name__ == "__main__":
-    test_directory = './tests'
-
     rules = parse_ossec_rules(rules_directory)
     run_tests(rules, test_directory)

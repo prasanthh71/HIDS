@@ -1,7 +1,5 @@
 import xml.etree.ElementTree as ET
 import os
-import json
-import re
 
 class Rule:
     def __init__(self, id, level, description, category, patterns=None):
@@ -61,38 +59,5 @@ def parse_single_file(file_path):
                 rules.append(Rule(rule_id, level, description, category, patterns))
 
     return rules
-
-def append_rules_to_json(file_path, list_of_rules):
-    rules_data = [rule.to_dict() for rule in list_of_rules]
-    
-    try:
-        with open(file_path, 'r') as file:
-            existing_data = json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError):
-        existing_data = []
-
-    existing_data.extend(rules_data)
-    
-    with open(file_path, 'w') as file:
-        json.dump(existing_data, file, indent=4)
-
-def is_attack_detected(log_message, rules):
-    for rule in rules:
-        for pattern in rule.patterns:
-            try:
-                compiled_pattern = re.compile(pattern)
-                
-                if compiled_pattern.search(log_message):
-                    # print(compiled_pattern)
-                    return True, rule
-            except re.error as e:
-                print(f"Error in pattern {pattern} for rule ID {rule.id}: {str(e)}")
-                
-    return False, None
-
-rules_directory = './rules.d'
-if __name__ == '__main__':
-    all_rules = parse_ossec_rules(rules_directory)
-    append_rules_to_json('./parsedRules.json',all_rules)
 
 
