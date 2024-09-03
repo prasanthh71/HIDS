@@ -1,4 +1,4 @@
-rules_directory = './rules.d'
+rules_directory = './rules'
 parsed_rules_file = './parsedRules.json'
 test_directory = './tests'
 
