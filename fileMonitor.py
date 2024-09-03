@@ -33,28 +33,24 @@ class LogMonitor:
                 self.machines_methods.get(self.host_machine,self.check_linus_logs)(file)
 
     def check_linus_logs(self, file):
-        # with open(file, 'r') as f:
-        #     f.seek(self.last_positions.get(file, 0))
-        #     new_lines = f.readlines()
-        #     self.last_positions[file] = f.tell()
+        with open(file, 'r') as f:
+            f.seek(self.last_positions.get(file, 0))
+            new_lines = f.readlines()
+            self.last_positions[file] = f.tell()
 
-        # for line in new_lines:
-        #     if "Failed password" in line:
-        #         print(f"New failed login attempt detected in {file}: {line.strip()}")
-        # print('linux log method is called')
-        print("Linux",file)
+        for line in new_lines:
+            print(line,file)
 
     def check_windows_logs(self, file):
-        # hand = win32evtlog.OpenEventLog(None, "Security")
-        # flags = win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ
-        # total = win32evtlog.GetNumberOfEventLogRecords(hand)
+        hand = win32evtlog.OpenEventLog(None, "Security")
+        flags = win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ
+        total = win32evtlog.GetNumberOfEventLogRecords(hand)
 
-        # events = win32evtlog.ReadEventLog(hand, flags, 0)
-        # for event in events:
-        #     if event.EventID == 4625:
-        #         print(f"New failed login attempt detected in Windows Event Log")
-        # print('windows log method is called')
-        print('Windows',file)
+        events = win32evtlog.ReadEventLog(hand, flags, 0)
+        for event in events:
+            # if event.EventID == 4625:
+            #     print(f"New failed login attempt detected in Windows Event Log")
+            print(event,file)
         
     def run(self):
         event_handler = LogFileHandler(self)
@@ -65,7 +61,7 @@ class LogMonitor:
         observer.start()
         try:
             while True:
-                time.sleep(1)
+                time.sleep(1) # change time accordingly
         except KeyboardInterrupt:
             observer.stop()
         observer.join()
