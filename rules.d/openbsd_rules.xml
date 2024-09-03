@@ -111,7 +111,7 @@
 
   <rule id="51516" level="0">
     <if_sid>51500</if_sid>
-    <pcre2>RTC BIOS diagnostic error 80</pcre2>
+    <pcre2>RTC BIOS diagnostic error 80\<clock_battery/></pcre2>
     <description>Clock battery error 80</description>
   </rule>
 

@@ -74,7 +74,7 @@ def run_tests(rules, test_directory):
     print(f"Accuracy: {passed_tests / total_tests * 100:.2f}%")
     
 if __name__ == "__main__":
-    test_directory = './ossec-rules/ossec-testing/tests'
+    test_directory = './tests'
 
     rules = parse_ossec_rules(rules_directory)
     run_tests(rules, test_directory)

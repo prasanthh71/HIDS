@@ -1,4 +1,5 @@
-from main import is_attack_detected,all_rules
+from main import is_attack_detected,parse_ossec_rules,rules_directory
+all_rules = parse_ossec_rules(rules_directory)
 
 tests = [
     "file system full",

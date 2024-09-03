@@ -491,7 +491,7 @@
 
   <rule id="18217" level="12">
     <if_sid>18207,18208</if_sid>
-    <!-- <pcre2> ID:[ ]+[()*+,.:;\<=>?\[\]!"'#%&$|{}-]*S-1-5-32-544</pcre2> -->
+    <pcre2> ID:[ ]+[()*+,.:;&lt;=&gt;?\[\]!"'#%$|{}-]*S-1-5-32-544</pcre2>
     <description>Administrators Group Changed</description>
     <group>group_changed,win_group_changed,</group>
     <info>http://support.microsoft.com/kb/243330</info>
