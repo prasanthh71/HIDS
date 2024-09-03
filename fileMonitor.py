@@ -1,61 +1,65 @@
 import os
 import time
+import platform
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import win32evtlog  # For Windows event log
-import re
+if platform.system().lower() == 'windows':
+    try:
+        import win32evtlog  # type: ignore # For Windows event log
+    except ImportError:
+        print("win32evtlog is not available on this system.")
+from constants import monitoring_files
 
 class LogMonitor:
     def __init__(self):
-        self.log_files = {
-            'linux': ['/var/log/auth.log', '/var/log/secure'],
-            'windows': ['C:\\Windows\\System32\\winevt\\Logs\\Security.evtx']
-        }
+        self.host_machine = platform.system().lower()
+        self.log_files = monitoring_files.get(self.host_machine, {})
         self.last_positions = {}
-        self.initialize_positions()
+        self.machinesMethods = {
+            'linus': self.checkLinusLogs,
+            'windows': self.checkWindowsLogs
+        }
+        self.initializePositions()
 
-    def initialize_positions(self):
-        for os_type, files in self.log_files.items():
-            for file in files:
-                if os.path.exists(file):
-                    self.last_positions[file] = os.path.getsize(file)
+    def initializePositions(self):
+        for file in self.log_files:
+            if os.path.exists(file):
+                self.last_positions[file] = os.path.getsize(file)
+        print(self.last_positions)
 
-    def check_new_logs(self):
-        for os_type, files in self.log_files.items():
-            for file in files:
-                if os.path.exists(file):
-                    if os_type == 'linux':
-                        self.check_linux_log(file)
-                    elif os_type == 'windows':
-                        self.check_windows_log(file)
+    def checkNewLogs(self):
+        for file in self.log_files:
+            if os.path.exists(file):
+                self.machinesMethods.get(self.host_machine,self.checkLinusLogs)(file)
 
-    def check_linux_log(self, file):
-        with open(file, 'r') as f:
-            f.seek(self.last_positions.get(file, 0))
-            new_lines = f.readlines()
-            self.last_positions[file] = f.tell()
+    def checkLinusLogs(self, file):
+        # with open(file, 'r') as f:
+        #     f.seek(self.last_positions.get(file, 0))
+        #     new_lines = f.readlines()
+        #     self.last_positions[file] = f.tell()
 
-        for line in new_lines:
-            if "Failed password" in line:
-                print(f"New failed login attempt detected in {file}: {line.strip()}")
+        # for line in new_lines:
+        #     if "Failed password" in line:
+        #         print(f"New failed login attempt detected in {file}: {line.strip()}")
+        print('linux log method is called')
 
-    def check_windows_log(self, file):
-        hand = win32evtlog.OpenEventLog(None, "Security")
-        flags = win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ
-        total = win32evtlog.GetNumberOfEventLogRecords(hand)
+    def checkWindowsLogs(self, file):
+        # hand = win32evtlog.OpenEventLog(None, "Security")
+        # flags = win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ
+        # total = win32evtlog.GetNumberOfEventLogRecords(hand)
 
-        events = win32evtlog.ReadEventLog(hand, flags, 0)
-        for event in events:
-            if event.EventID == 4625:
-                print(f"New failed login attempt detected in Windows Event Log")
-
+        # events = win32evtlog.ReadEventLog(hand, flags, 0)
+        # for event in events:
+        #     if event.EventID == 4625:
+        #         print(f"New failed login attempt detected in Windows Event Log")
+        print('windows log method is called')
+        
     def run(self):
         event_handler = LogFileHandler(self)
         observer = Observer()
-        for os_type, files in self.log_files.items():
-            for file in files:
-                if os.path.exists(file):
-                    observer.schedule(event_handler, path=os.path.dirname(file), recursive=False)
+        for file in self.log_files:
+            if os.path.exists(file):
+                observer.schedule(event_handler, path=os.path.dirname(file), recursive=False)
         observer.start()
         try:
             while True:
@@ -70,7 +74,8 @@ class LogFileHandler(FileSystemEventHandler):
 
     def on_modified(self, event):
         if not event.is_directory:
-            self.log_monitor.check_new_logs()
+            print("File modified: ", event.src_path)
+            self.log_monitor.checkNewLogs()
 
 if __name__ == "__main__":
     monitor = LogMonitor()
