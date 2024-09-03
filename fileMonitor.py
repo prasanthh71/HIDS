@@ -15,24 +15,24 @@ class LogMonitor:
         self.host_machine = platform.system().lower()
         self.log_files = monitoring_files.get(self.host_machine, {})
         self.last_positions = {}
-        self.machinesMethods = {
-            'linus': self.checkLinusLogs,
-            'windows': self.checkWindowsLogs
+        self.machines_methods = {
+            'linus': self.check_linus_logs,
+            'windows': self.check_windows_logs
         }
-        self.initializePositions()
+        self.initialize_positions()
 
-    def initializePositions(self):
+    def initialize_positions(self):
         for file in self.log_files:
             if os.path.exists(file):
                 self.last_positions[file] = os.path.getsize(file)
         print(self.last_positions)
 
-    def checkNewLogs(self):
+    def check_new_logs(self):
         for file in self.log_files:
             if os.path.exists(file):
-                self.machinesMethods.get(self.host_machine,self.checkLinusLogs)(file)
+                self.machines_methods.get(self.host_machine,self.check_linus_logs)(file)
 
-    def checkLinusLogs(self, file):
+    def check_linus_logs(self, file):
         # with open(file, 'r') as f:
         #     f.seek(self.last_positions.get(file, 0))
         #     new_lines = f.readlines()
@@ -41,9 +41,10 @@ class LogMonitor:
         # for line in new_lines:
         #     if "Failed password" in line:
         #         print(f"New failed login attempt detected in {file}: {line.strip()}")
-        print('linux log method is called')
+        # print('linux log method is called')
+        print("Linux",file)
 
-    def checkWindowsLogs(self, file):
+    def check_windows_logs(self, file):
         # hand = win32evtlog.OpenEventLog(None, "Security")
         # flags = win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ
         # total = win32evtlog.GetNumberOfEventLogRecords(hand)
@@ -52,7 +53,8 @@ class LogMonitor:
         # for event in events:
         #     if event.EventID == 4625:
         #         print(f"New failed login attempt detected in Windows Event Log")
-        print('windows log method is called')
+        # print('windows log method is called')
+        print('Windows',file)
         
     def run(self):
         event_handler = LogFileHandler(self)
@@ -74,8 +76,7 @@ class LogFileHandler(FileSystemEventHandler):
 
     def on_modified(self, event):
         if not event.is_directory:
-            print("File modified: ", event.src_path)
-            self.log_monitor.checkNewLogs()
+            self.log_monitor.machines_methods.get(self.log_monitor.host_machine,self.log_monitor.check_linus_logs)(event.src_path)
 
 if __name__ == "__main__":
     monitor = LogMonitor()
