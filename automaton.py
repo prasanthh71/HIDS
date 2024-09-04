@@ -10,9 +10,8 @@ def build_automaton(rules):
     return automaton
 
 # Searching logs using the Aho-Corasick automaton
-def search_logs(automaton, logs):
+def search_logs(automaton, log):
     matches = []
-    for log in logs:
-        for end_index, rule in automaton.iter(log):
-            matches.append((rule.id, rule.description, log))
+    for end_index, rule in automaton.iter(log):
+        matches.append((rule, log))
     return matches

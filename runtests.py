@@ -1,9 +1,9 @@
 import configparser
-from main import parse_ossec_rules
 import os
 import logging
-from constants import test_directory,rules_directory
-import re
+from constants import test_directory,automaton_data_file,rules_data_file
+from dataFormatter import load_file
+from automaton import search_logs
 
 def setup_logging(log_file='test_failures.log'):
     logging.basicConfig(
@@ -11,21 +11,6 @@ def setup_logging(log_file='test_failures.log'):
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
-
-def is_attack_detected(log_message, rules):
-    for rule in rules:
-        for pattern in rule.patterns:
-            try:
-                compiled_pattern = re.compile(pattern)
-                
-                if compiled_pattern.search(log_message):
-                    # print(compiled_pattern)
-                    return True, rule
-            except re.error as e:
-                print(f"Error in pattern {pattern} for rule ID {rule.id}: {str(e)}")
-                
-    return False, None
-
 
 def parse_test_file(file_path):
     config = configparser.ConfigParser(allow_no_value=True, interpolation=None)
@@ -49,8 +34,8 @@ def parse_test_file(file_path):
 def run_tests(rules, test_directory):
     setup_logging()
     total_tests = 0
-    passed_tests = 0
-
+    detected_tests = 0
+    automaton = load_file(automaton_data_file)
     for filename in os.listdir(test_directory):
         if filename.endswith('.ini'):
             file_path = os.path.join(test_directory, filename)
@@ -66,30 +51,26 @@ def run_tests(rules, test_directory):
                 expected_alert = int(test['alert']) if test['alert'] is not None else None
 
                 for log in test['logs']:
-                    is_attack, detected_rule = is_attack_detected(log, rules)
-                    
-                    if is_attack and detected_rule.id == expected_rule_id:
-                        passed_tests += 1
-                        break
+                    # is_attack, detected_rule = is_attack_detected(log, rules)
+                    matches = search_logs(automaton, log)
+                    log_message = (
+                        f"Test failed: {test['name']}, File: {filename}\n"
+                        f"Expected rule: {expected_rule_id}, Expected alert: {expected_alert}\n"
+                        f"Log: {log}\n"
+                    )
+                    if matches:
+                        detected_tests+=1
+                        for match in matches:
+                            log_message += f"Match found: Rule ID {match[0].id}, Description: {match[0].description}\n"
                     else:
-                        log_message = (
-                            f"Test failed: {test['name']}, File: {filename}\n"
-                            f"Expected rule: {expected_rule_id}, Expected alert: {expected_alert}\n"
-                            f"Log: {log}\n"
-                        )
-                        if is_attack:
-                            log_message += (
-                                f"Detected rule: {detected_rule.id}, Detected alert level: {detected_rule.level}\n"
-                            )
-                        else:
-                            log_message += "No rule detected\n"
+                        log_message += "No rule detected\n"
                         
-                        logging.info(log_message)
+                    logging.info(log_message)
 
     print(f"Total tests: {total_tests}")
-    print(f"Passed tests: {passed_tests}")
-    print(f"Accuracy: {passed_tests / total_tests * 100:.2f}%")
+    print(f"Detected tests: {detected_tests}")
+    print(f"Accuracy: {detected_tests / total_tests * 100:.2f}%")
     
 if __name__ == "__main__":
-    rules = parse_ossec_rules(rules_directory)
-    run_tests(rules, test_directory)
+    parsed_all_rules = load_file(rules_data_file)
+    run_tests(parsed_all_rules, test_directory)
