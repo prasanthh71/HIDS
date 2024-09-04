@@ -1,6 +1,9 @@
-rules_directory = './rules'
-parsed_rules_file = './parsedRules.json'
+rules_directory = './HIDSRules'
 test_directory = './tests'
+data_directory = './data'
+rules_data_file = './data/rulesData.pkl'
+automaton_data_file = './data/automaton.pkl'
+parsed_rules_json_file = './data/parsedRules.json'
 
 monitoring_files = {
     'windows': [
