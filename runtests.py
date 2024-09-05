@@ -4,6 +4,33 @@ import logging
 from constants import test_directory,automaton_data_file,rules_data_file
 from dataFormatter import load_file
 from automaton import search_logs
+import re
+import re
+
+def remove_date_time(log_line):
+    patterns = [
+        r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[\+\-]\d{2}:\d{2})?', 
+        r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:,\d{3})?',  
+        r'\d{2} [A-Za-z]{3} \d{4} \d{2}:\d{2}:\d{2}',        
+        r'\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}',             
+        r'\[.*?\]',                                          
+        r'\w{3} \d{1,2} \d{2} \d{2}:\d{2}:\d{2}',            
+        r'\d{2} \w{3} \d{2} \d{2}:\d{2}:\d{2}',              
+        r'\w{3} \d{1,2} \d{2} \d{2}:\d{2}:\d{2}',            
+        r'\d{2} \w{3} \d{2} \d{2}:\d{2}:\d{2}',              
+        r'\w{3} \d{2} \d{2}:\d{2}:\d{2}',                    
+    ]
+    
+    
+    combined_pattern = '|'.join(patterns)
+    
+    
+    cleaned_log = re.sub(combined_pattern, '', log_line)
+    
+    
+    cleaned_log = re.sub(r'\s+', ' ', cleaned_log).strip() 
+    
+    return cleaned_log
 
 def setup_logging(log_file='test_failures.log'):
     logging.basicConfig(
@@ -35,6 +62,7 @@ def run_tests(rules, test_directory):
     setup_logging()
     total_tests = 0
     detected_tests = 0
+    not_matched = 0
     automaton = load_file(automaton_data_file)
     for filename in os.listdir(test_directory):
         if filename.endswith('.ini'):
@@ -46,12 +74,14 @@ def run_tests(rules, test_directory):
                 continue
             
             for test in tests:
-                total_tests += 1
                 expected_rule_id = test['rule']
                 expected_alert = int(test['alert']) if test['alert'] is not None else None
 
                 for log in test['logs']:
+                    log = remove_date_time(log)
                     # is_attack, detected_rule = is_attack_detected(log, rules)
+                    flag = False
+                    total_tests += 1
                     matches = search_logs(automaton, log)
                     log_message = (
                         f"Test failed: {test['name']}, File: {filename}\n"
@@ -59,16 +89,22 @@ def run_tests(rules, test_directory):
                         f"Log: {log}\n"
                     )
                     if matches:
-                        detected_tests+=1
+                        
                         for match in matches:
+                            if match[0].id==expected_rule_id:
+                                flag = True
+                                detected_tests+=1
+                                break
                             log_message += f"Match found: Rule ID {match[0].id}, Description: {match[0].description}\n"
                     else:
                         log_message += "No rule detected\n"
-                        
-                    logging.info(log_message)
+                    if not flag:
+                        logging.info(log_message)
+                        not_matched+=1
 
     print(f"Total tests: {total_tests}")
     print(f"Detected tests: {detected_tests}")
+    print(f"Not matched tests: {not_matched}")
     print(f"Accuracy: {detected_tests / total_tests * 100:.2f}%")
     
 if __name__ == "__main__":
