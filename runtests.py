@@ -58,12 +58,28 @@ def parse_test_file(file_path):
         tests.append(test)
     return tests
 
+def is_attack_detected(log_message, rules):
+    output = []
+    for rule in rules:
+        for pattern in rule.patterns:
+            try:
+                compiled_pattern = re.compile(pattern)
+            except re.error as e:
+                # print(f"Error compiling pattern {pattern}: {str(e)}")
+                continue
+            if compiled_pattern.search(log_message):
+                output.append(rule)
+                # return True, rule
+    return output
+
 def run_tests(rules, test_directory):
     setup_logging()
     total_tests = 0
     detected_tests = 0
     not_matched = 0
-    automaton = load_file(automaton_data_file)
+    detected_and_not_matched = 0
+    # automaton = load_file(automaton_data_file)
+    parsed_all_rules = load_file(rules_data_file)
     for filename in os.listdir(test_directory):
         if filename.endswith('.ini'):
             file_path = os.path.join(test_directory, filename)
@@ -78,24 +94,27 @@ def run_tests(rules, test_directory):
                 expected_alert = int(test['alert']) if test['alert'] is not None else None
 
                 for log in test['logs']:
-                    log = remove_date_time(log)
+                    # log = remove_date_time(log)
+                    # print(log)
                     # is_attack, detected_rule = is_attack_detected(log, rules)
                     flag = False
                     total_tests += 1
-                    matches = search_logs(automaton, log)
+                    # matches = search_logs(automaton, log)
+                    matches = is_attack_detected(log,parsed_all_rules)
                     log_message = (
                         f"Test failed: {test['name']}, File: {filename}\n"
                         f"Expected rule: {expected_rule_id}, Expected alert: {expected_alert}\n"
                         f"Log: {log}\n"
                     )
                     if matches:
-                        
+                        detected_tests+=1
                         for match in matches:
-                            if match[0].id==expected_rule_id:
+                            log_message += f"Match found: Rule ID {match.id}, Description: {match.description}\n"
+                            if match.id==expected_rule_id:
                                 flag = True
-                                detected_tests+=1
                                 break
-                            log_message += f"Match found: Rule ID {match[0].id}, Description: {match[0].description}\n"
+                        if not flag:
+                            detected_and_not_matched+=1
                     else:
                         log_message += "No rule detected\n"
                     if not flag:
@@ -105,6 +124,7 @@ def run_tests(rules, test_directory):
     print(f"Total tests: {total_tests}")
     print(f"Detected tests: {detected_tests}")
     print(f"Not matched tests: {not_matched}")
+    print(f"Detected but not matched tests: {detected_and_not_matched}")
     print(f"Accuracy: {detected_tests / total_tests * 100:.2f}%")
     
 if __name__ == "__main__":
