@@ -1,3 +1,4 @@
+plyer==2.1.0
 pyahocorasick==2.1.0
 watchdog==5.0.1
 pywin32; platform_system == "Windows"
