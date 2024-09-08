@@ -42,7 +42,7 @@ class LogMonitor:
             print(line,file)
 
     def check_windows_logs(self, file):
-        hand = win32evtlog.OpenEventLog(None, "Security")
+        hand = win32evtlog.OpenEventLog(None, "Application")
         flags = win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ
         total = win32evtlog.GetNumberOfEventLogRecords(hand)
 
