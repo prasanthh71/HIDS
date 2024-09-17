@@ -38,10 +38,11 @@ class Alert:
     
 
 while True:
+    obj = Alert()
     intrusion_detected = int(input())
 
     if intrusion_detected:
-        # send_desktop_alert("Intrusion Alert", "Potential intrusion detected!")
-        pass
+        obj.send_desktop_alert("Intrusion Alert", "Potential intrusion detected!")
+        # pass
     else:
         break

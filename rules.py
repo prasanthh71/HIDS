@@ -55,7 +55,6 @@ def parse_single_file(file_path):
                         cleaned_pattern = pattern_elem.text.strip().rstrip('|')
                         if cleaned_pattern:
                             patterns.append(cleaned_pattern)
-                
-                rules.append(Rule(rule_id, level, description, category, patterns))
-
+                if patterns:
+                    rules.append(Rule(rule_id, level, description, category, patterns))
     return rules

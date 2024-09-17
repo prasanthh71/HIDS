@@ -78,7 +78,7 @@ def run_tests(rules, test_directory):
     detected_tests = 0
     not_matched = 0
     detected_and_not_matched = 0
-    # automaton = load_file(automaton_data_file)
+    automaton = load_file(automaton_data_file)
     parsed_all_rules = load_file(rules_data_file)
     for filename in os.listdir(test_directory):
         if filename.endswith('.ini'):
@@ -94,13 +94,9 @@ def run_tests(rules, test_directory):
                 expected_alert = int(test['alert']) if test['alert'] is not None else None
 
                 for log in test['logs']:
-                    # log = remove_date_time(log)
-                    # print(log)
-                    # is_attack, detected_rule = is_attack_detected(log, rules)
                     flag = False
                     total_tests += 1
-                    # matches = search_logs(automaton, log)
-                    matches = is_attack_detected(log,parsed_all_rules)
+                    matches = search_logs(automaton,log)
                     log_message = (
                         f"Test failed: {test['name']}, File: {filename}\n"
                         f"Expected rule: {expected_rule_id}, Expected alert: {expected_alert}\n"
