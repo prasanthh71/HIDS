@@ -23,7 +23,8 @@ class HIDSGUI:
         self.notebook.add(self.rules_frame, text="Rules")
 
         # Create Treeview
-        self.tree = ttk.Treeview(self.rules_frame, columns=("ID", "Level", "Category", "Description", "Patterns"), show="headings")
+        self.tree = ttk.Treeview(self.rules_frame, columns=("Index","ID", "Level", "Category", "Description", "Patterns"), show="headings")
+        self.tree.heading("Index", text="Index")
         self.tree.heading("ID", text="Rule ID")
         self.tree.heading("Level", text="Level")
         self.tree.heading("Category", text="Category")
@@ -31,6 +32,7 @@ class HIDSGUI:
         self.tree.heading("Patterns", text="Patterns")
 
         # Set column widths
+        self.tree.column("Index", width=40)
         self.tree.column("ID", width=50)
         self.tree.column("Level", width=50)
         self.tree.column("Category", width=100)
@@ -70,8 +72,8 @@ class HIDSGUI:
     def update_rules_treeview(self):
         for i in self.tree.get_children():
             self.tree.delete(i)
-        for rule in self.rules:
-            self.tree.insert("", "end", values=(rule.id, rule.level, rule.category, rule.description, ", ".join(rule.patterns)))
+        for idx,rule in enumerate(self.rules):
+            self.tree.insert("", "end", values=(idx,rule.id, rule.level, rule.category, rule.description, ", ".join(rule.patterns)))
 
     def add_rule(self):
         id = simpledialog.askstring("Add Rule", "Enter rule ID:")
