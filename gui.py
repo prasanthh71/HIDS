@@ -78,7 +78,7 @@ class HIDSGUI:
         level = simpledialog.askinteger("Add Rule", "Enter rule level:")
         description = simpledialog.askstring("Add Rule", "Enter rule description:")
         category = simpledialog.askstring("Add Rule", "Enter rule category:")
-        patterns = simpledialog.askstring("Add Rule", "Enter patterns (comma-separated):").split(',')
+        patterns = simpledialog.askstring("Add Rule", "Enter patterns")
         
         new_rule = Rule(id, level, description, category, patterns)
         self.rules.append(new_rule)
@@ -99,7 +99,7 @@ class HIDSGUI:
         rule.level = simpledialog.askinteger("Edit Rule", "Enter new level:", initialvalue=rule.level)
         rule.description = simpledialog.askstring("Edit Rule", "Enter new description:", initialvalue=rule.description)
         rule.category = simpledialog.askstring("Edit Rule", "Enter new category:", initialvalue=rule.category)
-        rule.patterns = simpledialog.askstring("Edit Rule", "Enter new patterns (comma-separated):", initialvalue=", ".join(rule.patterns)).split(',')
+        rule.patterns = simpledialog.askstring("Edit Rule", "Enter new patterns:", initialvalue=", ".join(rule.patterns))
 
         self.update_rules_treeview()
         save_file(self.rules,rules_data_file)
