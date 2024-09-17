@@ -1,12 +1,10 @@
 import re
 from collections import defaultdict
+from constants import automaton_data_file
+from dataFormatter import load_file
+from alert import send_desktop_alert
 
 def build_automaton(rules):
-    # automaton = ahocorasick.Automaton()
-    # for rule in rules:
-    #     for pattern in rule.patterns:
-    #         automaton.add_word(pattern, rule)
-    # automaton.make_automaton()
     automata = defaultdict(list)
     for rule in rules:
         for pattern in rule.patterns:
@@ -23,7 +21,6 @@ def build_automaton(rules):
                 continue
     return automata
 
-# Searching logs using the Aho-Corasick automaton
 def search_logs(automaton, log):
     matched_rules = set()
     words = set(re.findall(r'\b\w+\b', log))
@@ -34,3 +31,11 @@ def search_logs(automaton, log):
                 if pattern.search(log):
                     matched_rules.add(rule)
     return list(matched_rules)
+
+def detect_attack(log,file):   
+    automaton = load_file(automaton_data_file)
+    matched_rules = search_logs(automaton, log)
+    if matched_rules:
+        send_desktop_alert("Intrusion Alert", f"Potential intrusion detected in {file}! with log message: {log}")
+        pass
+    

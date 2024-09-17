@@ -3,6 +3,7 @@ import time
 import platform
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from automaton import detect_attack
 if platform.system().lower() == 'windows':
     try:
         import win32evtlog  # type: ignore # For Windows event log
@@ -25,7 +26,7 @@ class LogMonitor:
         for file in self.log_files:
             if os.path.exists(file):
                 self.last_positions[file] = os.path.getsize(file)
-        print(self.last_positions)
+        # print(self.last_positions)
 
     def check_new_logs(self):
         for file in self.log_files:
@@ -39,7 +40,7 @@ class LogMonitor:
             self.last_positions[file] = f.tell()
 
         for line in new_lines:
-            print(line,file)
+            detect_attack(line,file)
 
     def check_windows_logs(self, file):
         hand = win32evtlog.OpenEventLog(None, "Application")
@@ -48,9 +49,7 @@ class LogMonitor:
 
         events = win32evtlog.ReadEventLog(hand, flags, 0)
         for event in events:
-            # if event.EventID == 4625:
-            #     print(f"New failed login attempt detected in Windows Event Log")
-            print(event,file)
+            detect_attack(event,file)
         
     def run(self):
         event_handler = LogFileHandler(self)

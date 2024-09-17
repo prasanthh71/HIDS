@@ -10,13 +10,6 @@ class Alert:
     def should_alert(self):
         pass
     
-    def send_desktop_alert(self,title, message):
-        notification.notify(
-            title=title,
-            message=message,
-            app_icon=None,  # e.g. 'path/to/icon.png'
-            timeout=10,  # seconds
-        )
         
     def send_alert_email(self,subject, body, to_email):
         # Configure these settings
@@ -36,13 +29,20 @@ class Alert:
             server.login(sender_email, sender_password)
             server.send_message(message)
     
+def send_desktop_alert(title, message):
+    notification.notify(
+        title=title,
+        message=message,
+        app_icon=None,  # e.g. 'path/to/icon.png'
+        timeout=10,  # seconds
+    )
 
-while True:
-    obj = Alert()
-    intrusion_detected = int(input())
+# while True:
+#     obj = Alert()
+#     intrusion_detected = int(input())
 
-    if intrusion_detected:
-        obj.send_desktop_alert("Intrusion Alert", "Potential intrusion detected!")
-        # pass
-    else:
-        break
+#     if intrusion_detected:
+#         obj.send_desktop_alert("Intrusion Alert", "Potential intrusion detected!")
+#         # pass
+#     else:
+#         break
