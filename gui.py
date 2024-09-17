@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 from rules import Rule
 from constants import rules_data_file
-from dataFormatter import load_file
+from dataFormatter import load_file,save_file
 
 class HIDSGUI:
     def __init__(self, master):
@@ -74,7 +74,6 @@ class HIDSGUI:
             self.tree.insert("", "end", values=(rule.id, rule.level, rule.category, rule.description, ", ".join(rule.patterns)))
 
     def add_rule(self):
-        # This is a simplified version. You might want to create a more complex dialog
         id = simpledialog.askstring("Add Rule", "Enter rule ID:")
         level = simpledialog.askinteger("Add Rule", "Enter rule level:")
         description = simpledialog.askstring("Add Rule", "Enter rule description:")
@@ -83,6 +82,7 @@ class HIDSGUI:
         
         new_rule = Rule(id, level, description, category, patterns)
         self.rules.append(new_rule)
+        save_file(self.rules,rules_data_file)
         self.update_rules_treeview()
 
     def edit_rule(self):
@@ -95,7 +95,6 @@ class HIDSGUI:
         index = self.tree.index(selected_item)
         rule = self.rules[index]
 
-        # Again, this is simplified. You might want a more complex dialog
         rule.id = simpledialog.askstring("Edit Rule", "Enter new ID:", initialvalue=rule.id)
         rule.level = simpledialog.askinteger("Edit Rule", "Enter new level:", initialvalue=rule.level)
         rule.description = simpledialog.askstring("Edit Rule", "Enter new description:", initialvalue=rule.description)
@@ -103,6 +102,8 @@ class HIDSGUI:
         rule.patterns = simpledialog.askstring("Edit Rule", "Enter new patterns (comma-separated):", initialvalue=", ".join(rule.patterns)).split(',')
 
         self.update_rules_treeview()
+        save_file(self.rules,rules_data_file)
+
 
     def delete_rule(self):
         selected_item = self.tree.selection()
@@ -113,10 +114,9 @@ class HIDSGUI:
         index = self.tree.index(selected_item)
         del self.rules[index]
         self.update_rules_treeview()
+        save_file(self.rules,rules_data_file)
 
-# Assuming you have a Rule class defined as per your previous messages
 
-# Example usage:
 if __name__ == "__main__":
     root = tk.Tk()
     app = HIDSGUI(root)
