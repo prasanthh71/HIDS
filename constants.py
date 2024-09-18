@@ -5,6 +5,7 @@ rules_data_file = './data/rulesData.pkl'
 automaton_data_file = './data/automaton.pkl'
 parsed_rules_json_file = './data/parsedRules.json'
 alerts_data_file = './data/alertsData.pkl'
+all_alert_notification_data_file = './data/alertNotification.pkl'
 
 monitoring_files = {
     'windows': [

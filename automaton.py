@@ -32,10 +32,10 @@ def search_logs(automaton, log):
                     matched_rules.add(rule)
     return list(matched_rules)
 
-def detect_attack(log,file):   
+def detect_attack(log,file):
     automaton = load_file(automaton_data_file)
     matched_rules = search_logs(automaton, log)
     if matched_rules:
         print(log)
-        send_desktop_alert("Intrusion Alert", f"Potential intrusion detected in {file}! with log message: {log}")
+        send_desktop_alert("Intrusion Alert", f"Potential intrusion detected in {file}! with log message: {log}",matched_rules)
     
