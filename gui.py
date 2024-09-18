@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox, simpledialog
 from rules import Rule
 from constants import rules_data_file,all_alert_notification_data_file
 from dataFormatter import load_file,save_file
+from constants import alerts_data_file
 
 class HIDSGUI:
     def __init__(self, master):
@@ -153,12 +154,12 @@ class HIDSGUI:
         attacks_btn_frame.grid(row=1, column=0, columnspan=2, pady=10)
 
         # Add attack button
-        add_attack_btn = ttk.Button(attacks_btn_frame, text="Clear Attacks", command=self.clear_attacks)
-        add_attack_btn.pack(side=tk.LEFT, padx=5)
+        clear_attacks_btn = ttk.Button(attacks_btn_frame, text="Clear Attacks", command=self.clear_attacks)
+        clear_attacks_btn.pack(side=tk.LEFT, padx=5)
 
         # Remove attack button
-        remove_attack_btn = ttk.Button(attacks_btn_frame, text="Remove Attack", command=self.remove_attack)
-        remove_attack_btn.pack(side=tk.LEFT, padx=5)
+        refresh_attacks_btn = ttk.Button(attacks_btn_frame, text="Refresh", command=self.refresh_attacks)
+        refresh_attacks_btn.pack(side=tk.LEFT, padx=5)
 
         # Configure grid weights for attacks frame
         self.attacks_frame.grid_rowconfigure(0, weight=1)
@@ -235,18 +236,16 @@ class HIDSGUI:
             self.attacks_tree.insert("", "end", values=(attack.timestamp, attack.logMessage, f"{len(attack.detectedAttacks)} attacks"), tags=(str(i),))
         
     def clear_attacks(self):
-        # TODO
-        print("Clearning Attacks")
-
-    def remove_attack(self):
-        selected_item = self.attacks_tree.selection()
-        if not selected_item:
-            messagebox.showwarning("Remove Attack", "Please select an attack to remove.")
-            return
-        index = self.attacks_tree.index(selected_item)
-        del self.attacks_data[index]
+        alerts_data = load_file(alerts_data_file)
+        self.attacks_data = []
         self.update_attacks_treeview()
+        alerts_data['count'] = 0
+        save_file(alerts_data,alerts_data_file)
         save_file(self.attacks_data,all_alert_notification_data_file)
+
+    def refresh_attacks(self):
+        self.attacks_data = load_file(all_alert_notification_data_file) or []
+        self.update_attacks_treeview()
 
 if __name__ == "__main__":
     root = tk.Tk()
