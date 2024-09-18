@@ -4,6 +4,7 @@ data_directory = './data'
 rules_data_file = './data/rulesData.pkl'
 automaton_data_file = './data/automaton.pkl'
 parsed_rules_json_file = './data/parsedRules.json'
+alerts_data_file = './data/alertsData.pkl'
 
 monitoring_files = {
     'windows': [
@@ -47,4 +48,9 @@ monitoring_files = {
         "/lib/systemd/systemd",
         "/etc/ld.so.conf"
     ]
+}
+
+alertsObject = {
+    'count':0,
+    'defaultMessage':"Looks like more attack are happening check attacks."
 }

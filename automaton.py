@@ -36,6 +36,6 @@ def detect_attack(log,file):
     automaton = load_file(automaton_data_file)
     matched_rules = search_logs(automaton, log)
     if matched_rules:
+        print(log)
         send_desktop_alert("Intrusion Alert", f"Potential intrusion detected in {file}! with log message: {log}")
-        pass
     

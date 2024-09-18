@@ -1,8 +1,8 @@
 import os
 from dataFormatter import save_file,load_file,append_rules_to_json
 from rules import parse_ossec_rules
-from constants import rules_directory, rules_data_file,data_directory
-from constants import parsed_rules_json_file,automaton_data_file
+from constants import rules_directory, rules_data_file,data_directory,alertsObject
+from constants import parsed_rules_json_file,automaton_data_file,alerts_data_file
 from automaton import build_automaton
 from fileMonitor import LogMonitor
 
@@ -22,6 +22,10 @@ if __name__ == '__main__':
     if not os.path.exists(automaton_data_file):
         automaton = build_automaton(parsed_all_rules)
         save_file(automaton,automaton_data_file)
+        
+    if not os.path.exists(alerts_data_file):
+        alerts_data = alertsObject
+        save_file(alerts_data,alerts_data_file)
         
     # create log monitor
     print("Monitoring logs for intrusion detection...")
