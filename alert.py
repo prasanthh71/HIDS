@@ -33,6 +33,7 @@ def send_desktop_alert(title, message,detectedAttacks):
     alerts_data = load_file(alerts_data_file)
     alerts_notifications_data = load_file(all_alert_notification_data_file)
     alerts_notifications_data.append(Alert(message,detectedAttacks))
+    print(alerts_data['count'])
     if alerts_data['count'] == 0:
         notification.notify(
             title=title,
