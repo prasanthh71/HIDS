@@ -47,8 +47,6 @@ def send_desktop_alert(title, message,detectedAttacks):
             app_icon=None,
             timeout=10
         )
-    else:
-        return
-    alerts_data['count'] = (alerts_data['count']+1)%3
+    alerts_data['count'] = (alerts_data['count']+1)
     save_file(alerts_data,alerts_data_file)
     save_file(alerts_notifications_data,all_alert_notification_data_file)
