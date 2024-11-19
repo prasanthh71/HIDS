@@ -1,6 +1,7 @@
 import os
 import time
 import platform
+import subprocess
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from automaton import detect_attack
@@ -33,14 +34,40 @@ class LogMonitor:
             if os.path.exists(file):
                 self.machines_methods.get(self.host_machine,self.check_linus_logs)(file)
 
-    def check_linus_logs(self, file):
-        with open(file, 'r') as f:
-            f.seek(self.last_positions.get(file, 0))
-            new_lines = f.readlines()
-            self.last_positions[file] = f.tell()
 
-        for line in new_lines:
-            detect_attack(line,file)
+    def check_linus_logs(self, file):
+        # with open(file, 'r') as f:
+        #     f.seek(self.last_positions.get(file, 0))
+        #     new_lines = f.readlines()
+        #     self.last_positions[file] = f.tell()
+
+        # for line in new_lines:
+        #     detect_attack(line,file)
+        try:
+            # Method 1: Using sudo subprocess if file needs root access
+            if not os.access(file, os.R_OK):
+                cmd = ['sudo', 'cat', file]
+                result = subprocess.run(cmd, capture_output=True, text=True)
+                if result.returncode == 0:
+                    lines = result.stdout.splitlines()
+                    for line in lines:
+                        detect_attack(line, file)
+                else:
+                    print(f"Error reading file {file}: {result.stderr}")
+                return
+
+            # Method 2: Direct file reading if permissions allow
+            with open(file, 'r') as f:
+                f.seek(self.last_positions.get(file, 0))
+                new_lines = f.readlines()
+                self.last_positions[file] = f.tell()
+                for line in new_lines:
+                    detect_attack(line, file)
+
+        except PermissionError:
+            print(f"Permission denied for {file}. Try running with sudo.")
+        except Exception as e:
+            print(f"Error processing {file}: {str(e)}")
 
     def check_windows_logs(self, file):
         hand = win32evtlog.OpenEventLog(None, "Application")

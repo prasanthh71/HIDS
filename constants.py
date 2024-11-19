@@ -47,7 +47,10 @@ monitoring_files = {
         "/bin/sh",
         "/sbin/init",
         "/lib/systemd/systemd",
-        "/etc/ld.so.conf"
+        "/etc/ld.so.conf",
+        "/etc/resolv.conf",
+        "/etc/hosts.allow",
+        "/etc/hosts.deny"
     ]
 }
 
