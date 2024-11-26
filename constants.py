@@ -6,6 +6,7 @@ automaton_data_file = './data/automaton.pkl'
 parsed_rules_json_file = './data/parsedRules.json'
 alerts_data_file = './data/alertsData.pkl'
 all_alert_notification_data_file = './data/alertNotification.pkl'
+userManagementDataFile = './data/userManagementData.pkl'
 
 monitoring_files = {
     'windows': [
@@ -57,4 +58,9 @@ monitoring_files = {
 alertsObject = {
     'count':0,
     'defaultMessage':"Looks like more attack are happening check attacks."
+}
+
+userManagementData = {
+    'email':"",
+    'sendEmailAlerts':False
 }

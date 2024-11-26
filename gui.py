@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 from rules import Rule
-from constants import rules_data_file,all_alert_notification_data_file
+from constants import rules_data_file,all_alert_notification_data_file,userManagementDataFile
 from dataFormatter import load_file,save_file
 from constants import alerts_data_file
 
@@ -12,7 +12,7 @@ class HIDSGUI:
         self.attacks_data = load_file(all_alert_notification_data_file) or []
         self.master.title("Host Intrusion Detection System")
         self.master.geometry("1000x600")
-
+        self.userData = load_file(userManagementDataFile)
         self.create_widgets()
 
     def create_widgets(self):
@@ -29,6 +29,55 @@ class HIDSGUI:
         self.attacks_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.attacks_frame, text="Detected Attacks")
         self.create_attacks_widgets()
+        
+        self.users_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.users_frame, text="User Management")
+        self.create_user_management_widgets()
+        
+    def create_user_management_widgets(self):
+        # Email label and entry
+        email_label = ttk.Label(self.users_frame, text="Email:")
+        email_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+
+        self.email_entry = ttk.Entry(self.users_frame, width=40)
+        self.email_entry.grid(row=0, column=1, padx=10, pady=10, sticky="w")
+
+        self.email_entry.insert(0, self.userData['email'])
+
+        # Toggle for receiving emails
+        self.send_mail_var = tk.BooleanVar(value=self.userData['sendEmailAlerts'])
+        send_mail_toggle = ttk.Checkbutton(
+            self.users_frame,
+            text="Send Mail Notifications",
+            variable=self.send_mail_var
+        )
+        send_mail_toggle.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+
+        # Save button
+        save_button = ttk.Button(self.users_frame, text="Save", command=self.save_user_details)
+        save_button.grid(row=2, column=0, columnspan=2, pady=20)
+
+        # Configure grid weights
+        self.users_frame.grid_rowconfigure(3, weight=1)
+        self.users_frame.grid_columnconfigure(1, weight=1)
+
+    def save_user_details(self):
+        # Get user input
+        email = self.email_entry.get().strip()
+        send_mail = self.send_mail_var.get()
+
+        # Validate email
+        if not email:
+            messagebox.showerror("Invalid Input", "Email cannot be empty.")
+            return
+
+        # Update user data
+        self.userData['email'] = email
+        self.userData['sendEmailAlerts'] = send_mail
+
+        # Save to file
+        save_file(self.userData, userManagementDataFile)
+        messagebox.showinfo("Success", "User details updated successfully.")
         
     def create_rules_widgets(self):
         # Create Treeview

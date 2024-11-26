@@ -2,9 +2,10 @@
 from plyer import notification
 # from email.mime.text import MIMEText
 # from email.mime.multipart import MIMEMultipart
-from constants import alerts_data_file,all_alert_notification_data_file
+from constants import alerts_data_file,all_alert_notification_data_file,userManagementDataFile
 from dataFormatter import load_file,save_file
 from datetime import datetime
+import requests
 
 class Alert:
     def __init__(self,logMessage,detectedAttacks):
@@ -33,7 +34,14 @@ def send_desktop_alert(title, message,detectedAttacks):
     alerts_data = load_file(alerts_data_file)
     alerts_notifications_data = load_file(all_alert_notification_data_file)
     alerts_notifications_data.append(Alert(message,detectedAttacks))
+    userData = load_file(userManagementDataFile)
+    url = "http://127.0.0.1:5000/send-email"
     print(alerts_data['count'])
+    data = {
+        'to':userData['email'],
+        'subject':"HIDS Alert",
+        'body':message
+    }
     if alerts_data['count'] == 0:
         notification.notify(
             title=title,
@@ -41,6 +49,18 @@ def send_desktop_alert(title, message,detectedAttacks):
             app_icon=None,  # e.g. 'path/to/icon.png'
             timeout=10,
         )
+        try:
+            response = requests.post(url, json=data)
+            
+            if response.status_code == 200:
+                print("Request successful!")
+                print("Response JSON:", response.json())
+            else:
+                print(f"Request failed with status code: {response.status_code}")
+                print("Response:", response.text)
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+
     elif alerts_data['count'] == 1:
         notification.notify(
             title=title,
@@ -48,6 +68,19 @@ def send_desktop_alert(title, message,detectedAttacks):
             app_icon=None,
             timeout=10
         )
+        try:
+            data['body'] = alerts_data['defaultMessage']
+            response = requests.post(url, json=data)
+            
+            if response.status_code == 200:
+                print("Request successful!")
+                print("Response JSON:", response.json())
+            else:
+                print(f"Request failed with status code: {response.status_code}")
+                print("Response:", response.text)
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+
     alerts_data['count'] = (alerts_data['count']+1)
     save_file(alerts_data,alerts_data_file)
     save_file(alerts_notifications_data,all_alert_notification_data_file)
