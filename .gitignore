@@ -4,3 +4,4 @@ parsedRules.json
 test_failures.log
 .venv
 data
+backend/.env
