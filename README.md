@@ -1,6 +1,6 @@
 1. Clone the repository
     ```
-    git clone https://github.com/seabeepraveen/HIDS
+    https://github.com/prasanthh71/HIDS.git
     ```
 2. Create the virtual environment
     ```
